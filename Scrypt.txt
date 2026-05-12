@@ -1,0 +1,203 @@
+
+SQL*Plus: Release 10.2.0.1.0 - Production on Mar May 12 18:08:56 2026
+
+Copyright (c) 1982, 2005, Oracle.  All rights reserved.
+
+SQL> CONNECT SYSTEM
+Introduzca la contrase±a:
+Conectado.
+SQL> CREATE USER MANOLO_GARCIA IDENTIFIED BY uta2026;
+
+Usuario creado.
+
+SQL> GRANT CONNECT, RESOURCE TO MANOLO_GARCIA;
+
+Concesi¾n terminada correctamente.
+
+SQL> ALTER USER MANOLO_GARCIA QUOTA UNLIMITED ON USERS;
+
+Usuario modificado.
+
+SQL> COONECT MANOLO_GARCIA
+SP2-0734: inicio "COONECT MA..." de comando desconocido - resto de la lÝnea ignorado.
+SQL> uta2026
+SP2-0042: comando desconocido "uta2026" - resto de la lÝnea ignorado.
+SQL> CONNECT MANOLO_GARCIA
+Introduzca la contrase±a:
+Conectado.
+SQL> CREATE TABLE GENERO (
+  2      id_genero NUMBER PRIMARY KEY,
+  3      nombre VARCHAR2(50) NOT NULL UNIQUE
+  4  );
+
+Tabla creada.
+
+SQL> CREATE TABLE DIRECTOR (
+  2      id_director NUMBER PRIMARY KEY,
+  3      nombre VARCHAR2(100) NOT NULL,
+  4      nacionalidad VARCHAR2(50)
+  5  );
+
+Tabla creada.
+
+SQL> CREATE TABLE ACTOR (
+  2      id_actor NUMBER PRIMARY KEY,
+  3      nombre VARCHAR2(100) NOT NULL,
+  4      fecha_nacimiento DATE
+  5  );
+
+Tabla creada.
+
+SQL> CREATE TABLE PELICULA (
+  2      id_pelicula NUMBER PRIMARY KEY,
+  3      titulo VARCHAR2(150) NOT NULL,
+  4      anio NUMBER CHECK (anio > 1888),
+  5      id_genero NUMBER,
+  6      id_director NUMBER,
+  7      CONSTRAINT fk_p_gen FOREIGN KEY (id_genero)
+  8          REFERENCES GENERO(id_genero) ON DELETE CASCADE, [cite: 26, 52]
+  9      CONSTRAINT fk_p_dir FOREIGN KEY (id_director)
+ 10          REFERENCES DIRECTOR(id_director) ON DELETE CASCADE [cite: 26, 52]
+ 11
+SQL>
+SQL> CREATE TABLE PELICULA (
+  2      id_pelicula NUMBER PRIMARY KEY,
+  3      titulo VARCHAR2(150) NOT NULL,
+  4      anio NUMBER CHECK (anio > 1888),
+  5      id_genero NUMBER,
+  6      id_director NUMBER,
+  7      CONSTRAINT fk_p_gen FOREIGN KEY (id_genero)
+  8          REFERENCES GENERO(id_genero) ON DELETE CASCADE,
+  9      CONSTRAINT fk_p_dir FOREIGN KEY (id_director)
+ 10          REFERENCES DIRECTOR(id_director) ON DELETE CASCADE
+ 11  );
+
+Tabla creada.
+
+SQL> CREATE TABLE PARTICIPACION (
+  2      id_pelicula NUMBER,
+  3      id_actor NUMBER,
+  4      papel VARCHAR2(100),
+  5      PRIMARY KEY (id_pelicula, id_actor),
+  6      CONSTRAINT fk_pa_pel FOREIGN KEY (id_pelicula)
+  7          REFERENCES PELICULA(id_pelicula) ON DELETE CASCADE,
+  8      CONSTRAINT fk_pa_act FOREIGN KEY (id_actor)
+  9          REFERENCES ACTOR(id_actor) ON DELETE CASCADE
+ 10  );
+
+Tabla creada.
+
+SQL> INSERT INTO GENERO VALUES (1, 'Accion');
+
+1 fila creada.
+
+SQL> INSERT INTO GENERO VALUES (2, 'Drama');
+
+1 fila creada.
+
+SQL> INSERT INTO DIRECTOR VALUES (10, 'Christopher Nolan', 'Britanico');
+
+1 fila creada.
+
+SQL> INSERT INTO ACTOR VALUES (100, 'Leonardo DiCaprio', TO_DATE('1974-11-11','YYYY-MM-DD'));
+
+1 fila creada.
+
+SQL> INSERT INTO ACTOR VALUES (200, 'Cillian Murphy', TO_DATE('1976-05-25','YYYY-MM-DD'));
+
+1 fila creada.
+
+SQL> INSERT INTO PELICULA VALUES (50, 'Inception', 2010, 1, 10);
+
+1 fila creada.
+
+SQL> INSERT INTO PELICULA VALUES (51, 'Oppenheimer', 2023, 2, 10);
+
+1 fila creada.
+
+SQL> INSERT INTO PARTICIPACION VALUES (50, 100, 'Cobb');
+
+1 fila creada.
+
+SQL> INSERT INTO PARTICIPACION VALUES (51, 200, 'Oppenheimer');
+
+1 fila creada.
+
+SQL> COMMIT;
+
+Confirmaci¾n terminada.
+
+SQL> UPDATE ACTOR SET nombre = 'L. DiCaprio' WHERE id_actor = 100;
+
+1 fila actualizada.
+
+SQL> INSERT INTO PELICULA VALUES (99, 'Error', 2024, 999, 10);
+INSERT INTO PELICULA VALUES (99, 'Error', 2024, 999, 10)
+*
+ERROR en lÝnea 1:
+ORA-02291: restricci¾n de integridad (MANOLO_GARCIA.FK_P_GEN) violada - clave
+principal no encontrada
+
+
+SQL> SELECT P.titulo, D.nombre AS Director, G.nombre AS Genero
+  2  FROM PELICULA P
+  3  JOIN DIRECTOR D ON P.id_director = D.id_director
+  4  JOIN GENERO G ON P.id_genero = G.id_genero
+  5  WHERE P.anio BETWEEN 2000 AND 2026;
+
+TITULO
+--------------------------------------------------------------------------------
+DIRECTOR
+--------------------------------------------------------------------------------
+GENERO
+--------------------------------------------------
+Inception
+Christopher Nolan
+Accion
+
+Oppenheimer
+Christopher Nolan
+Drama
+
+TITULO
+--------------------------------------------------------------------------------
+DIRECTOR
+--------------------------------------------------------------------------------
+GENERO
+--------------------------------------------------
+
+
+SQL> SELECT * FROM ACTOR
+  2  WHERE nombre LIKE 'L%'
+  3  AND id_actor IN (100, 200);
+
+  ID_ACTOR
+----------
+NOMBRE
+--------------------------------------------------------------------------------
+FECHA_NACI
+----------
+       100
+L. DiCaprio
+11/11/1974
+
+
+SQL>
+SQL> SELECT AVG(anio) FROM PELICULA;
+
+ AVG(ANIO)
+----------
+    2016,5
+
+SQL> DELETE FROM DIRECTOR WHERE id_director = 10;
+
+1 fila suprimida.
+
+SQL> SELECT * FROM PELICULA;
+
+ninguna fila seleccionada
+
+SQL>
+
+
+
